@@ -1,0 +1,17 @@
+---
+
+- name: Launch node-exporter container
+  become: true
+  docker_container:
+    name: node-exporter
+    restart_policy: unless-stopped
+    image: prom/node-exporter:latest
+    pid_mode: host
+    volumes:
+      - "/:/host:ro,rslave"
+    command: 
+      - '--path.rootfs=/host'
+    ports:
+    - "9100:9100"
+    env:
+      TZ: Europe/Amsterdam

@@ -1,0 +1,164 @@
+---
+# TODO: setup this structure to version control configuration /home/{{ ansible_user }}/home-assistant
+# - name: Checkout home-assistant repository
+
+- name: Create HA config directory
+  file:
+    path: /home/{{ ansible_user }}/home-assistant/config
+    state: directory
+
+- name: Create mosquitto config directory
+  file:
+    path: /home/{{ ansible_user }}/home-assistant/mosquitto/config
+    state: directory
+
+- name: Create mosquitto log directory
+  file:
+    path: /home/{{ ansible_user }}/home-assistant/mosquitto/log
+    state: directory
+
+- name: Create mosquitto data directory
+  file:
+    path: /home/{{ ansible_user }}/home-assistant/mosquitto/data
+    state: directory
+
+- name: Create portainer data directory
+  file:
+    path: /home/{{ ansible_user }}/home-assistant/portainer_data
+    state: directory
+
+- name: Create letsencrypt config directory
+  file:
+    path: /home/{{ ansible_user }}/home-assistant/letsencrypt_config
+    state: directory
+
+- name: "Launch portainer container"
+  become: true
+  docker_container:
+    name: portainer-ce
+    restart_policy: always
+    image: portainer/portainer-ce:2.11.0
+    volumes:
+    - /home/{{ ansible_user }}/api/portainer_data:/data
+    - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+    - "9000:9000"
+
+- name: Create VS Code directory
+  file:
+    path: /home/{{ ansible_user }}/home-assistant/vscode
+    state: directory
+
+- name: Launch VS Code container
+  become: true
+  docker_container:
+    name: vscode
+    restart_policy: unless-stopped
+    image: linuxserver/code-server:latest
+    volumes:
+    - /home/{{ ansible_user }}/home-assistant/vscode:/config
+    - /home/{{ ansible_user }}/home-assistant/config:/config/workspace
+    ports:
+    - "8443:8443"
+    env:
+      TZ: Europe/Amsterdam
+      PGID: "0"
+      PUID: "0"
+      PASSWORD: "{{ vscode_password }}"
+
+- name: Create NodeRED directory
+  become: true
+  file:
+    path: /home/{{ ansible_user }}/api/nodered
+    state: directory
+    #NodeRED need 1000 owner permission on mount path
+    owner: 1000
+
+- name: "Launch NodeRED container"
+  become: true
+  docker_container:
+    name: nodered
+    restart_policy: always
+    image: nodered/node-red:latest
+    volumes:
+    - /home/{{ ansible_user }}/api/nodered:/data
+    ports:
+    - "1880:1880"
+    env:
+      TZ: Europe/Amsterdam   
+    
+- name: "Launch home-assistant container"
+  become: true
+  docker_container:
+    name: homeassistant
+    restart_policy: unless-stopped
+    image: homeassistant/home-assistant
+    volumes:
+    - /home/{{ ansible_user }}/home-assistant/config/:/config/
+    network_mode: host
+    privileged: true
+    env:
+      TZ: Europe/Amsterdam
+
+- name: "Launch mqtt container"
+  become: true
+  docker_container:
+    name: mqtt
+    restart_policy: unless-stopped
+    image: eclipse-mosquitto:latest
+    volumes:
+    - /home/{{ ansible_user }}/home-assistant/mosquitto/config:/mosquitto/config:ro
+    - /home/{{ ansible_user }}/home-assistant/mosquitto/log:/mosquitto/log
+    - /home/{{ ansible_user }}/home-assistant/mosquitto/data/:/mosquitto/data
+    network_mode: host
+    privileged: true
+    env:
+      TZ: Europe/Amsterdam
+
+- name: "Launch zigbee2mqtt container"
+  become: true
+  docker_container:
+    name: zigbee2mqtt_stable_usb_port
+    restart_policy: unless-stopped
+    image: koenkk/zigbee2mqtt:latest
+    volumes:
+    - /home/{{ ansible_user }}/home-assistant/zigbee2mqtt/run/udev:/run/udev:ro
+    - /home/{{ ansible_user }}/home-assistant/zigbee2mqtt/data:/app/data
+    devices:
+    - /dev/ttyUSB0:/dev/ttyACM0:rwm
+    network_mode: host
+    privileged: true
+    env:
+      TZ: Europe/Amsterdam
+
+- name: "Launch duckdns container"
+  become: true
+  docker_container:
+    name: duckdns
+    restart_policy: unless-stopped
+    image: linuxserver/duckdns
+    network_mode: host
+    privileged: true
+    env:
+      TZ: Europe/Amsterdam
+      SUBDOMAINS: minhpho
+      TOKEN: "{{ duckdns_token }}"
+
+- name: "Launch letsencrypt container"
+  become: true
+  docker_container:
+    name: letsencrypt
+    restart_policy: unless-stopped
+    image: linuxserver/letsencrypt
+    volumes:
+    - /home/{{ ansible_user }}/home-assistant/letsencrypt_config:/config
+    ports:
+    - "80:80"
+    - "443:443"
+    env:
+      PGID: "1000"
+      PUID: "1000"
+      URL: minhpho.duckdns.org
+      SUBDOMAINS: ha
+      VALIDATION: http
+      TZ: Europe/Amsterdam      

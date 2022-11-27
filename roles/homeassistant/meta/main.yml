@@ -1,0 +1,7 @@
+---
+dependencies:
+  - role: git
+  - role: docker
+  - role: ha_grafana
+  - role: ha_prometheus
+  - role: node-exporter

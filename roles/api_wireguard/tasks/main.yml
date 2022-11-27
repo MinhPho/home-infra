@@ -1,0 +1,37 @@
+---
+
+- name: Create Wireguard directory
+  become: true
+  file:
+    path: /home/{{ ansible_user }}/api/wireguard
+    state: directory
+
+- name: Create Wireguard config directory
+  become: true
+  file:
+    path: /home/{{ ansible_user }}/api/wireguard/config
+    state: directory
+
+- name: Launch Wireguard container
+  become: true
+  docker_container:
+    name: wireguard
+    capabilities:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      net.ipv4.conf.all.src_valid_mark: 1
+    restart_policy: unless-stopped
+    image: linuxserver/wireguard:latest
+    volumes:
+    - /home/{{ ansible_user }}/api/wireguard/config:/etc/pihole
+    - /lib/modules:/lib/modules
+    ports:
+    - "51820:51820/udp"
+    env:
+      PGID: "1000"
+      PUID: "1000"
+      TZ: "europe/amsterdam"
+      PEERS: "1"
+
+      

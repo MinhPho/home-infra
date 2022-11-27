@@ -1,0 +1,16 @@
+---
+# file: site.yml
+- hosts: minh-ubuntu-homeassistant
+  roles:
+    - homeassistant
+    - homebridge
+
+- hosts: minh-ubuntu-api
+  roles:
+    - tensorflow
+    - api_wireguard
+
+- hosts: minh-ubuntu-ansible
+  roles:
+    - git
+    - docker
