@@ -22,28 +22,6 @@
     path: /home/{{ ansible_user }}/home-assistant/mosquitto/data
     state: directory
 
-- name: Create portainer data directory
-  file:
-    path: /home/{{ ansible_user }}/home-assistant/portainer_data
-    state: directory
-
-- name: Create letsencrypt config directory
-  file:
-    path: /home/{{ ansible_user }}/home-assistant/letsencrypt_config
-    state: directory
-
-- name: "Launch portainer container"
-  become: true
-  docker_container:
-    name: portainer-ce
-    restart_policy: always
-    image: portainer/portainer-ce:2.11.0
-    volumes:
-    - /home/{{ ansible_user }}/api/portainer_data:/data
-    - /var/run/docker.sock:/var/run/docker.sock
-    ports:
-    - "9000:9000"
-
 - name: Create VS Code directory
   file:
     path: /home/{{ ansible_user }}/home-assistant/vscode
@@ -131,34 +109,34 @@
     env:
       TZ: Europe/Amsterdam
 
-- name: "Launch duckdns container"
-  become: true
-  docker_container:
-    name: duckdns
-    restart_policy: unless-stopped
-    image: linuxserver/duckdns
-    network_mode: host
-    privileged: true
-    env:
-      TZ: Europe/Amsterdam
-      SUBDOMAINS: minhpho
-      TOKEN: "{{ duckdns_token }}"
+# - name: "Launch duckdns container"
+#   become: true
+#   docker_container:
+#     name: duckdns
+#     restart_policy: unless-stopped
+#     image: linuxserver/duckdns
+#     network_mode: host
+#     privileged: true
+#     env:
+#       TZ: Europe/Amsterdam
+#       SUBDOMAINS: minhpho
+#       TOKEN: "{{ duckdns_token }}"
 
-- name: "Launch letsencrypt container"
-  become: true
-  docker_container:
-    name: letsencrypt
-    restart_policy: unless-stopped
-    image: linuxserver/letsencrypt
-    volumes:
-    - /home/{{ ansible_user }}/home-assistant/letsencrypt_config:/config
-    ports:
-    - "80:80"
-    - "443:443"
-    env:
-      PGID: "1000"
-      PUID: "1000"
-      URL: minhpho.duckdns.org
-      SUBDOMAINS: ha
-      VALIDATION: http
-      TZ: Europe/Amsterdam      
+# - name: "Launch letsencrypt container"
+#   become: true
+#   docker_container:
+#     name: letsencrypt
+#     restart_policy: unless-stopped
+#     image: linuxserver/letsencrypt
+#     volumes:
+#     - /home/{{ ansible_user }}/home-assistant/letsencrypt_config:/config
+#     ports:
+#     - "80:80"
+#     - "443:443"
+#     env:
+#       PGID: "1000"
+#       PUID: "1000"
+#       URL: minhpho.duckdns.org
+#       SUBDOMAINS: ha
+#       VALIDATION: http
+#       TZ: Europe/Amsterdam      

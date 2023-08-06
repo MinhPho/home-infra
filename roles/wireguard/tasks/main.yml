@@ -3,13 +3,13 @@
 - name: Create Wireguard directory
   become: true
   file:
-    path: /home/{{ ansible_user }}/api/wireguard
+    path: /home/{{ ansible_user }}/{{ data_folder }}/wireguard
     state: directory
 
 - name: Create Wireguard config directory
   become: true
   file:
-    path: /home/{{ ansible_user }}/api/wireguard/config
+    path: /home/{{ ansible_user }}/{{ data_folder }}/wireguard/config
     state: directory
 
 - name: Launch Wireguard container
@@ -24,7 +24,7 @@
     restart_policy: unless-stopped
     image: linuxserver/wireguard:latest
     volumes:
-    - /home/{{ ansible_user }}/api/wireguard/config:/etc/pihole
+    - /home/{{ ansible_user }}/{{ data_folder }}/wireguard/config:/config
     - /lib/modules:/lib/modules
     ports:
     - "51820:51820/udp"

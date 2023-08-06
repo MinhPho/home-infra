@@ -3,7 +3,7 @@
 - name: Create portainer data directory
   become: true
   file:
-    path: /home/{{ ansible_user }}/api/portainer_data
+    path: /home/{{ ansible_user }}/{{ data_folder }}/portainer_data
     state: directory
 
 - name: "Launch portainer container"
@@ -11,58 +11,55 @@
   docker_container:
     name: portainer-ce
     restart_policy: always
-    image: portainer/portainer-ce:2.11.0
+    image: portainer/portainer-ce:latest
     volumes:
-    - /home/{{ ansible_user }}/api/portainer_data:/data
+    - /home/{{ ansible_user }}/{{ data_folder }}/portainer_data:/data
     - /var/run/docker.sock:/var/run/docker.sock
     ports:
     - "9000:9000"
 
-- name: Create Plex directory
-  become: true
-  file:
-    path: /home/{{ ansible_user }}/api/plex_home
-    state: directory
-
-
 - name: Create PiHole etc directory
   become: true
   file:
-    path: /home/{{ ansible_user }}/api/pihole/etc
+    path: /home/{{ ansible_user }}/{{ data_folder }}/pihole/etc
     state: directory
 
 - name: Create PiHole dnsmasq directory
   become: true
   file:
-    path: /home/{{ ansible_user }}/api/pihole/dnsmasq.d
+    path: /home/{{ ansible_user }}/{{ data_folder }}/pihole/dnsmasq.d
     state: directory
 
-- name: "Launch Plex container"
-  become: true
-  docker_container:
-    name: plex
-    restart_policy: always
-    image: linuxserver/plex
-    network_mode: host
-    volumes:
-    - /home/{{ ansible_user }}/api/plex_home/config:/config
-    - /media/NAS/tvseries:/tv
-    - /media/NAS/movies:/movies
-
-
 - name: Allow access to tcp port 53
+  become: true
   community.general.ufw:
     rule: allow
     port: '53'
     proto: tcp
 
 - name: Allow access to udp port 53
+  become: true
   community.general.ufw:
     rule: allow
     port: '53'
     proto: udp
 
+- name: Allow access to tcp port 443
+  become: true
+  community.general.ufw:
+    rule: allow
+    port: '443'
+    proto: tcp
+
+- name: Allow access to tcp port 5335
+  become: true
+  community.general.ufw:
+    rule: allow
+    port: '5335'
+    proto: tcp
+
 - name: Enable UFW
+  become: true
   community.general.ufw:
     state: enabled   
 
@@ -73,8 +70,8 @@
     restart_policy: unless-stopped
     image: pihole/pihole:latest
     volumes:
-    - /home/{{ ansible_user }}/api/pihole/etc:/etc/pihole
-    - /home/{{ ansible_user }}/api/pihole/dnsmasq.d:/etc/dnsmasq.d
+    - /home/{{ ansible_user }}/{{ data_folder }}/pihole/etc:/etc/pihole
+    - /home/{{ ansible_user }}/{{ data_folder }}/pihole/dnsmasq.d:/etc/dnsmasq.d
     ports:
     - "53:53/tcp"
     - "53:53/udp"
@@ -84,4 +81,4 @@
       WEBPASSWORD: "{{ pihole_password }}"
       FTLCONF_LOCAL_IPV4: 192.168.50.152
       FTLCONF_REPLY_ADDR4: 192.168.50.152
-      
+
