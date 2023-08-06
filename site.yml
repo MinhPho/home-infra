@@ -4,13 +4,20 @@
   roles:
     - homeassistant
     - homebridge
+    - portainer
+    - nginx_proxy_manager
+    - esxi_vm
 
 - hosts: minh-ubuntu-api
   roles:
-    - tensorflow
-    - api_wireguard
+    - portainer_agent
+    - pihole
+    - wireguard
+    - esxi_vm
 
 - hosts: minh-ubuntu-ansible
   roles:
+    - portainer_agent
     - git
     - docker
+    - esxi_vm
