@@ -1,0 +1,23 @@
+---
+
+- name: Create nginx_proxy_manager directory
+  file:
+    path: /home/{{ ansible_user }}/{{ data_folder }}/nginx_proxy_manager
+    state: directory
+
+# For DNS challenge I'm using tmunforever@gmail.com at DuckDNS
+- name: Launch nginx_proxy_manager container
+  become: true
+  docker_container:
+    name: nginx_proxy_manager
+    restart_policy: unless-stopped
+    image: jc21/nginx-proxy-manager:latest
+    volumes:
+      - /home/{{ ansible_user }}/{{ data_folder }}/nginx_proxy_manager/data:/data
+      - /home/{{ ansible_user }}/{{ data_folder }}/nginx_proxy_manager/letsencrypt:/etc/letsencrypt
+    ports:
+    - "80:80"
+    - "443:443"   
+    - "81:81"   
+    env:
+      TZ: Europe/Amsterdam

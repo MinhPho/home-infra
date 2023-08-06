@@ -1,0 +1,8 @@
+---
+
+- name: install open_vm_tools
+  become: true
+  apt: 
+    name: open-vm-tools
+    state: present
+    update_cache: yes

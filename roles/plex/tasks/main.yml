@@ -1,0 +1,20 @@
+---
+# file: roles/plex/tasks/main.yml
+
+- name: Create Plex directory
+  become: true
+  file:
+    path: /home/{{ ansible_user }}/api/plex_home
+    state: directory
+
+- name: "Launch Plex container"
+  become: true
+  docker_container:
+    name: plex
+    restart_policy: always
+    image: linuxserver/plex
+    network_mode: host
+    volumes:
+    - /home/{{ ansible_user }}/api/plex_home/config:/config
+    - /media/NAS/tvseries:/tv
+    - /media/NAS/movies:/movies
