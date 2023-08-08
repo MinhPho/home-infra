@@ -1,23 +1,5 @@
 ---
 
-- name: Create portainer data directory
-  become: true
-  file:
-    path: /home/{{ ansible_user }}/{{ data_folder }}/portainer_data
-    state: directory
-
-- name: "Launch portainer container"
-  become: true
-  docker_container:
-    name: portainer-ce
-    restart_policy: always
-    image: portainer/portainer-ce:latest
-    volumes:
-    - /home/{{ ansible_user }}/{{ data_folder }}/portainer_data:/data
-    - /var/run/docker.sock:/var/run/docker.sock
-    ports:
-    - "9000:9000"
-
 - name: Create PiHole etc directory
   become: true
   file:
