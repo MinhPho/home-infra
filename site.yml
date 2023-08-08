@@ -21,3 +21,4 @@
     - git
     - docker
     - esxi_vm
+    - ansible_semaphore
