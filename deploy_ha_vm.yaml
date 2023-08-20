@@ -1,0 +1,10 @@
+---
+
+- name: Deploy all Home Assistant related components in HA vm
+  hosts: minh-ubuntu-homeassistant
+  roles:
+    - homeassistant
+    - homebridge
+    - portainer
+    - nginx_proxy_manager
+    - esxi_vm

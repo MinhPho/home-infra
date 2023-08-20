@@ -13,10 +13,10 @@
     restart_policy: unless-stopped
     image: semaphoreui/semaphore:latest
     volumes:
-    - /home/{{ ansible_user }}/semaphore/home:/etc/semaphore
-    - /home/{{ ansible_user }}/semaphore/lib:/var/lib/semaphore
+      - /home/{{ ansible_user }}/semaphore/home:/etc/semaphore
+      - /home/{{ ansible_user }}/semaphore/lib:/var/lib/semaphore
     ports:
-    - "3000:3000"
+      - "3000:3000"
     privileged: true
     env:
       SEMAPHORE_DB_DIALECT: bolt

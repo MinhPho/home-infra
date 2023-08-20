@@ -1,0 +1,9 @@
+---
+
+- name: Deploy all API components in API vm
+  hosts: minh-ubuntu-api
+  roles:
+    - portainer_agent
+    - pihole
+    - wireguard
+    - esxi_vm

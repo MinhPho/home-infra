@@ -1,0 +1,10 @@
+---
+
+- name: Deploy all Ansible related components in Ansible vm
+  hosts: minh-ubuntu-ansible
+  roles:
+    - portainer_agent
+    - git
+    - docker
+    - esxi_vm
+    - ansible_semaphore
