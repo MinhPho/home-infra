@@ -1,0 +1,21 @@
+---
+- name: Create Heimdall config directory
+  file:
+    path: /home/{{ ansible_user }}/heimdall/config
+    state: directory
+
+- name: Launch Heimdall container
+  become: true
+  docker_container:
+    name: heimdall
+    restart_policy: unless-stopped
+    image: lscr.io/linuxserver/heimdall:latest
+    volumes:
+      - /home/{{ ansible_user }}/heimdall/config:/data
+    ports:
+    - "80:80"
+    - "443:443"    
+    env:
+      TZ: Europe/Amsterdam
+      PGID: "1000"
+      PUID: "1000"

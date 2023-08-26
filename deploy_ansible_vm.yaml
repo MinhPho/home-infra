@@ -8,3 +8,4 @@
     - docker
     - esxi_vm
     - ansible_semaphore
+    - heimdall
