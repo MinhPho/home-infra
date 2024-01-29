@@ -1,0 +1,26 @@
+---
+- name: Create MagicMirror config directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - /home/{{ ansible_user }}/MagicMirror/config
+    - /home/{{ ansible_user }}/MagicMirror/modules
+    - /home/{{ ansible_user }}/MagicMirror/css
+
+- name: Launch MagicMirror container
+  become: true
+  docker_container:
+    name: magicmirror
+    restart_policy: unless-stopped
+    image: bastilimbach/docker-magicmirror:latest
+    volumes:
+      - /home/{{ ansible_user }}/MagicMirror/config:/opt/magic_mirror/config
+      - /home/{{ ansible_user }}/MagicMirror/modules:/opt/magic_mirror/modules
+      # - /home/{{ ansible_user }}/MagicMirror/css:/opt/magic_mirror/css
+    ports:
+    - "8080:8080"   
+    env:
+      TZ: Europe/Amsterdam
+      PGID: "1000"
+      PUID: "1000"

@@ -4,6 +4,7 @@
   hosts: minh-ubuntu-api
   roles:
     - portainer_agent
-    - pihole
+    # - pihole
     - wireguard
     - esxi_vm
+    - magicmirror
